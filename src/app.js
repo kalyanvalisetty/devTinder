@@ -42,8 +42,6 @@ app.patch("/update",async(req,res)=>{
   }
 })
 
-
-
 connectDB()
 .then(()=>{
   console.log("Connected to Database");
@@ -53,4 +51,3 @@ connectDB()
 }).catch((err)=>{
   console.error("Error connecting to DB: "+err.message);
 })
-
