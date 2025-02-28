@@ -1,53 +1,29 @@
 const express = require("express");
 const connectDB = require("./config/database");
-const User = require("./models/user")
+const cookieParser = require("cookie-parser");
+const cors = require("cors");
 const app = express();
 
+app.use(cookieParser());
 app.use(express.json());
+app.use(cors());
 
-app.get("/feed", async(req, res)=>{
-   try{
-    const user = await User.findOne({emailId: req.body.emailId});
-    res.status(200).send(user);
-   } catch(err){
-    res.status(400).send("Something Went wrong!");
-   }
-});
+const authRouter = require("./routes/auth.js");
+const profileRouter = require("./routes/profile.js");
+const requestRouter = require("./routes/requestRouter.js");
 
-app.delete("/delete", async(req, res)=>{
-  try{
-   const user = await User.findByIdAndDelete({_id: req.body.userId});
-   res.status(200).send("User Deleted");
-  } catch(err){
-   res.status(400).send("Something Went wrong!");
-  }
-});
 
-app.post("/signup",async(req,res)=>{
-  const user = new User(req.body)
-  try{
-    await user.save();
-    res.status(200).send("User successfully added");
-  }catch(error){
-    console.log("Error: ",error);
-  }
-})
-
-app.patch("/update",async(req,res)=>{
-  try{
-    const user = await User.findByIdAndUpdate({_id: req.body.userId}, req.body);
-    res.status(200).send("User successfully Updated");
-  }catch(error){
-    console.log("Error: ",error);
-  }
-})
+app.use('/', authRouter);
+app.use('/', profileRouter);
+app.use('/', requestRouter);
 
 connectDB()
-.then(()=>{
-  console.log("Connected to Database");
-  app.listen('3199',()=>{
-    console.log("Server is Up and running");
+  .then(() => {
+    console.log("Connected to Database");
+    app.listen("3199", () => {
+      console.log("Server is Up and running");
+    });
   })
-}).catch((err)=>{
-  console.error("Error connecting to DB: "+err.message);
-})
+  .catch((err) => {
+    console.error("Error connecting to DB: " + err.message);
+  });

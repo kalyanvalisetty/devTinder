@@ -1,3 +1,5 @@
+const jwt = require("jsonwebtoken");
+const User = require("../models/user");
 
 const adminAuth = (req,res,next)=>{
     const token = "xyz";
@@ -10,14 +12,23 @@ const adminAuth = (req,res,next)=>{
     }
 }
 
-const userAuth = (req,res,next)=>{
-    const token = "xyz";
-    const isuserAuth = token === "xyz"
-    if(!isuserAuth){
+const userAuth = async(req,res,next)=>{
+    try{
+    const {token} = req.cookies;
+    if(!token){
+        return res.status(404).send("Please Login");
+    }
+    const decodedMessage = await jwt.verify(token, 'KALa@12345');
+    const user = await User.findById(decodedMessage._id);
+    if(!user){
         res.status(404).send("User is not Authorized");
     }
     else{
+        req.user = user;
         next()
+    }
+    } catch(err){
+        res.status(400).send("Error: "+err.message);
     }
 
 }
