@@ -1,4 +1,3 @@
-const validator = require("validator")
 
 const signupValidate = (req) =>{
     const {age} = req.body;
@@ -8,9 +7,11 @@ const signupValidate = (req) =>{
 }
 
 const validateEditProfileData = (req) =>{
-     const ALLOWED_UPDATES = ["firstName","photoUrl","about","location","skills"]
+     const ALLOWED_UPDATES = ["firstName","lastName","photoUrl","about","location","skills","age"]
       const keys = Object.keys(req.body);
+      console.log(keys)
       const isUpdateAllowed = keys.map((k)=>ALLOWED_UPDATES.includes(k));
+      console.log(isUpdateAllowed)
       if(isUpdateAllowed.includes(false)){
         throw new Error("Updated is Not Allowed");
       }

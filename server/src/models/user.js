@@ -77,15 +77,15 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-userSchema.methods.getJWT = async function(){
+userSchema.methods.getJWT = function(){
   const user = this;
-  const token = await jwt.sign({_id: user._id}, "KALa@12345",{expiresIn:"1d"});
+  const token = jwt.sign({_id: user._id}, "KALa@12345",{expiresIn:"1d"});
   return token;
 }
 
-userSchema.methods.validatePassword = async function(req){
+userSchema.methods.validatePassword = async function(passwordInputByUser){
   const user = this;
-  const isValid = await bcrypt.compareSync(req.body.password, user.password);
+  const isValid = await bcrypt.compare(passwordInputByUser, user.password);
   return isValid;
 }
 

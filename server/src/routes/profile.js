@@ -1,21 +1,22 @@
 const express = require("express");
 const profileRouter = express.Router();
+
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const { userAuth } = require("../middlewares/auth");
 const { validateEditProfileData, validateEditPasword } = require("../utils/validator");
 
 
-profileRouter.get("/profile/view", userAuth, async (req, res) => {
+profileRouter.get("/view", userAuth, async (req, res) => {
     try {
       const user = req.user;
-      res.status(200).send(user);
+      res.status(200).json({success: true, messsage: user});
     } catch (err) {
-      res.status(400).send("Something Went wrong!");
+      res.status(400).send({success: false, messsage: err.message});
     }
   });
 
-profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
+profileRouter.patch("/edit-details", userAuth, async (req, res) => {
     try {
       validateEditProfileData(req);
       const user = await User.findByIdAndUpdate(
@@ -26,22 +27,22 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
           runValidators: true,
         }
       );
-      res.status(200).send("User successfully Updated");
-    } catch (error) {
-      res.send("Error: "+error.message);
+      res.status(200).json({success: true, messsage: "User details successfully updated"});
+    } catch (err) {
+      res.status(400).json({success: false, messsage: err.message});
     }
   });
 
-profileRouter.patch("/profile/edit-password", userAuth, async (req, res) => {
+profileRouter.patch("/edit-password", userAuth, async (req, res) => {
     try {
       validateEditPasword(req);
       const user = req.user;      
-      user.password = bcrypt.hashSync(req.body.password, 10);
-      
+      user.password = await bcrypt.hash(req.body.password, 10);
+
       await user.save();
-      res.status(200).send("Password Updated");
+      res.status(200).json({success: true, messsage: "Password Updated"});
     } catch (err) {
-      res.status(400).send("message "+ err.message);
+      res.status(400).json({success: false, messsage: err.message});
     }
   });
 
